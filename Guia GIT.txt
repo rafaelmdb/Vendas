@@ -1,0 +1,50 @@
+Criar um repositório:
+git init nome
+Crie o repo no GitHub
+
+Adicionando arquivos alterados no repo local:
+git add arquivos
+Pode usar pasta como git add /src
+ou máscara como git add .
+
+Removendo um arquivo
+git rm arquivo
+
+Enviando as alterações:
+git commit -m "Mensagem obrigatória"
+Antes de enviar faça o pull para pegaras atualizações
+git pull
+git push
+
+Trabalhando com branches
+Criando um branch:
+git branch nome_do_branch
+
+Ativando o branch:
+git checkout nome_do_branch
+
+Submeter dados é igual... add, commit, push.
+
+Fazendo o merge:
+Depois de subir (push) o branch faça:
+git checkout branch_que_recebera_o_merge_ex_master
+git merge branch_de_origem_ex_dev
+git commit
+git push
+
+Recomendação:
+Sempre faça pull antes do push.
+
+Obs:
+Quando faz o merge e tem arquivos novos não precisa fazer o add.
+Basta fazer o merge e o push. No push observei que não mostra como arquivo
+adicionado. Penso que é porque o add foi no branch de origem
+
+Estudar:
+Rebase, avança o branch para os dados do branch de destino. 
+Não sei dos riscos de danificar o branch
+
+Comandos úteis:
+git status: status do branch
+git log: log do branch
+git reset: volta tudo para o status inicial.
