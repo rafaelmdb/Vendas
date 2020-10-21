@@ -1,53 +1,66 @@
 package com.github.rafaelmdb.domain.service;
 
-import com.github.rafaelmdb.api.dto.PessoaDTO;
+import com.github.rafaelmdb.domain.dto.ProdutoDTO;
+import com.github.rafaelmdb.domain.entity.Produto;
 import com.github.rafaelmdb.domain.exception.RegraNegocioException;
+import com.github.rafaelmdb.domain.repo.ProdutoRepo;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.UUID;
+import javax.validation.Valid;
+import java.util.*;
 
 @Service
-public class PessoaServiceImpl implements ProdutoService {
-    private final PessoaRepo pessoaRepo;
+public class ProdutoServiceImpl implements ProdutoService {
+    @Autowired
+    private MessageService messageService;
 
-    public PessoaServiceImpl(PessoaRepo pessoaRepo) {
-        this.pessoaRepo = pessoaRepo;
+    private final ProdutoRepo produtoRepo;
+    public ProdutoServiceImpl(ProdutoRepo produtoRepo){
+        this.produtoRepo = produtoRepo;
     }
 
     @Override
-    public Pessoa criar(PessoaDTO dto) {
-        Pessoa pessoa = new Pessoa();
-        pessoa.setNome(dto.getNome());
-        pessoa.setDataNascimento(dto.getDataNascimento());
-        pessoa.setIdade(dto.getIdade());
-        pessoa.setCidade(dto.getCidade());
-        pessoa.setNomePai(dto.getNomePai());
-        pessoa.setNomeMae(dto.getNomeMae());
+    public List<Produto> criar(List<ProdutoDTO> dto){
+        List<Produto> produtos = new ArrayList<Produto>();
 
-        return pessoaRepo.save(pessoa);
+        dto.forEach(produtoDTO ->{
+            Produto produto = new Produto(produtoDTO.getCodigo(), produtoDTO.getReferencia(), produtoDTO.getDescricao(), produtoDTO.getEstoque());
+            validarProduto(produto);
+            produtos.add(produto);
+        });
+
+        return produtoRepo.saveAll(produtos);
+    }
+
+    private void validarProduto(Produto produto){
+        if(Strings.isEmpty(produto.getDescricao())){
+            throw new RegraNegocioException(messageService.getMessage("descricao.obrigatoria",null));
+        }
     }
 
     @Override
-    public Pessoa alterar(UUID id, PessoaDTO dto) {
-        return pessoaRepo.findById(id)
-                .map(pessoa -> {
-                    pessoa.setCidade(dto.getCidade());
-                    pessoa.setDataNascimento(dto.getDataNascimento());
-                    pessoa.setIdade(dto.getIdade());
-                    pessoa.setCidade(dto.getCidade());
-                    pessoa.setNome(dto.getNome());
-                    pessoa.setNomeMae(dto.getNomeMae());
-                    pessoa.setNomePai(dto.getNomePai());
+    public Produto alterar(UUID id, ProdutoDTO dto) {
+        Produto produto = this.obterPorId(id);
+        produto.setCodigo(dto.getCodigo());
+        produto.setReferencia(dto.getReferencia());
+        produto.setDescricao(dto.getDescricao());
+        produto.setEstoque(dto.getEstoque());
 
-                    pessoaRepo.save(pessoa);
-                    return pessoa;
-                })
-                .orElseThrow(() -> new RegraNegocioException(String.format("Pessoa {0} não encontrada", dto.getNome())));
+        return produtoRepo.save(produto);
+    }
+
+    public Produto obterPorId(UUID id) {
+        return produtoRepo
+                .findById(id)
+                .orElseThrow(()->new RegraNegocioException("produto.nao.encontrado"));
     }
 
     @Override
-    public Optional<PessoaDTO> obter(UUID id) {
-        return Optional.empty();
+    public void remover(UUID id) {
+        Produto produto = obterPorId(id);
+        produtoRepo.delete(produto);
     }
 }

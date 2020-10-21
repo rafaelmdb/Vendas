@@ -1,5 +1,6 @@
 package com.github.rafaelmdb.config;
 
+import com.github.rafaelmdb.VendasApplication;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
