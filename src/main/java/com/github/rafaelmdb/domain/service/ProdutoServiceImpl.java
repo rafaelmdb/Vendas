@@ -1,16 +1,14 @@
 package com.github.rafaelmdb.domain.service;
 
 import com.github.rafaelmdb.api.dto.PessoaDTO;
-import com.github.rafaelmdb.domain.entity.Pessoa;
 import com.github.rafaelmdb.domain.exception.RegraNegocioException;
-import com.github.rafaelmdb.domain.repo.PessoaRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class PessoaServiceImpl implements PessoaService {
+public class PessoaServiceImpl implements ProdutoService {
     private final PessoaRepo pessoaRepo;
 
     public PessoaServiceImpl(PessoaRepo pessoaRepo) {

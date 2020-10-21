@@ -1,7 +1,6 @@
 package com.github.rafaelmdb.domain.service;
 
 import com.github.rafaelmdb.api.dto.PessoaDTO;
-import com.github.rafaelmdb.domain.entity.Pessoa;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
