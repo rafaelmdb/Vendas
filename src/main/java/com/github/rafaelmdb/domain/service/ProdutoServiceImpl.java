@@ -4,6 +4,7 @@ import com.github.rafaelmdb.domain.dto.ProdutoDTO;
 import com.github.rafaelmdb.domain.entity.Produto;
 import com.github.rafaelmdb.domain.exception.RegraNegocioException;
 import com.github.rafaelmdb.domain.repo.ProdutoRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -13,6 +14,7 @@ import javax.validation.Valid;
 import java.util.*;
 
 @Service
+@Slf4j
 public class ProdutoServiceImpl implements ProdutoService {
     @Autowired
     private MessageService messageService;
