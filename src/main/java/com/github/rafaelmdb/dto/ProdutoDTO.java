@@ -1,6 +1,8 @@
-package com.github.rafaelmdb.domain.dto;
+package com.github.rafaelmdb.dto;
 
+import com.github.rafaelmdb.base.BaseDto;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +12,9 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProdutoDTO {
+@Builder
+public class ProdutoDTO extends BaseDto {
+    private UUID id;
     private String codigo;
     private String referencia;
     private String descricao;

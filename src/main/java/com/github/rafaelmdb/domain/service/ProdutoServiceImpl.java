@@ -1,40 +1,32 @@
 package com.github.rafaelmdb.domain.service;
 
-import com.github.rafaelmdb.domain.dto.ProdutoDTO;
 import com.github.rafaelmdb.domain.entity.Produto;
-import com.github.rafaelmdb.domain.exception.RegraNegocioException;
 import com.github.rafaelmdb.domain.repo.ProdutoRepo;
+import com.github.rafaelmdb.exception.RegraNegocioException;
+import com.github.rafaelmdb.service.BaseService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
 import java.util.*;
 
 @Service
 @Slf4j
-public class ProdutoServiceImpl implements ProdutoService {
+public class ProdutoServiceImpl extends BaseService implements ProdutoService {
     @Autowired
     private MessageService messageService;
 
     private final ProdutoRepo produtoRepo;
+
     public ProdutoServiceImpl(ProdutoRepo produtoRepo){
         this.produtoRepo = produtoRepo;
     }
 
     @Override
-    public List<Produto> criar(List<ProdutoDTO> dto){
-        List<Produto> produtos = new ArrayList<Produto>();
-
-        dto.forEach(produtoDTO ->{
-            Produto produto = new Produto(produtoDTO.getCodigo(), produtoDTO.getReferencia(), produtoDTO.getDescricao(), produtoDTO.getEstoque());
-            validarProduto(produto);
-            produtos.add(produto);
-        });
-
-        return produtoRepo.saveAll(produtos);
+    public Produto criar(Produto produto){
+        validarProduto(produto);
+        return produtoRepo.save(produto);
     }
 
     private void validarProduto(Produto produto){
@@ -44,13 +36,9 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
-    public Produto alterar(UUID id, ProdutoDTO dto) {
-        Produto produto = this.obterPorId(id);
-        produto.setCodigo(dto.getCodigo());
-        produto.setReferencia(dto.getReferencia());
-        produto.setDescricao(dto.getDescricao());
-        produto.setEstoque(dto.getEstoque());
-
+    public Produto alterar(UUID id, Produto produto) {
+        validarAlteracao(id, produto.getId(), produtoRepo);
+        validarProduto(produto);
         return produtoRepo.save(produto);
     }
 

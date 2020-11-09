@@ -40,6 +40,11 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.rafaelmdb</groupId>
+            <artifactId>CoreLib</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
