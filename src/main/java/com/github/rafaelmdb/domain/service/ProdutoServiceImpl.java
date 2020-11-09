@@ -36,8 +36,8 @@ public class ProdutoServiceImpl extends BaseService implements ProdutoService {
     }
 
     @Override
-    public Produto alterar(UUID id, Produto produto) {
-        validarAlteracao(id, produto.getId(), produtoRepo);
+    public Produto alterar(Produto produto) {
+        validarAlteracao(produto.getId(), produtoRepo);
         validarProduto(produto);
         return produtoRepo.save(produto);
     }

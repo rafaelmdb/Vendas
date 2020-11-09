@@ -12,7 +12,7 @@ public interface ProdutoService {
     Produto criar(Produto produto);
 
     @Transactional
-    Produto alterar(UUID id, Produto produto);
+    Produto alterar(Produto produto);
 
     @Transactional
     void remover(UUID id);

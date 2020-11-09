@@ -39,7 +39,7 @@ public class ProdutoController {
     @ResponseStatus(HttpStatus.OK)
     public UUID alterar(@PathVariable UUID id, @RequestBody ProdutoDTO dto) {
         Produto produto = produtoConverter.createFrom(dto);
-        return produtoService.alterar(id, produto).getId();
+        return produtoService.alterar(produto).getId();
     }
 
     @DeleteMapping("{id}")
