@@ -1,6 +1,7 @@
 package com.github.rafaelmdb.domain.entity;
 
 
+import com.github.rafaelmdb.base.BaseEntity;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
@@ -10,7 +11,7 @@ import java.util.UUID;
 @Entity
 @Data
 @Table(name="UF")
-public class UF {
+public class UF extends BaseEntity {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name="UUID",

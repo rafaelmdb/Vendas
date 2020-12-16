@@ -64,7 +64,7 @@ public class ClienteController {
                 .withIgnoreCase()
                 .withStringMatcher(ExampleMatcher.StringMatcher.STARTING);
 
-        Example example = Example.of(clienteConverter.createFrom(filtro));
+        Example example = Example.of(clienteConverter.createFrom(filtro), matcher);
 
         List<ClienteDTO> resultado = clienteConverter.createFromEntities(
                 clienteRepo.findAll(example));

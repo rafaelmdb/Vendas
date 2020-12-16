@@ -65,7 +65,7 @@ public class ProdutoController {
                 .withIgnoreCase()
                 .withStringMatcher(ExampleMatcher.StringMatcher.STARTING);
 
-        Example example = Example.of(produtoConverter.createFrom(filtro));
+        Example example = Example.of(produtoConverter.createFrom(filtro), matcher);
 
         List<ProdutoDTO> resultado = produtoConverter.createFromEntities(
                 produtoRepo.findAll(example));

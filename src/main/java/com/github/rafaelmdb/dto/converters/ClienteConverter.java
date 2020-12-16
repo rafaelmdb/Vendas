@@ -12,6 +12,7 @@ public class ClienteConverter extends BaseConverter<Cliente, ClienteDTO>{
     protected Cliente DoCreateFrom(ClienteDTO dto){
         Cliente cliente = new Cliente();
         cliente.setId(dto.getId());
+        cliente.setNome(dto.getNome());
         cliente.setTipoPessoa(dto.getTipoPessoa());
         cliente.setCnpjCpf(dto.getCnpjcpf());
         cliente.setEmail(dto.getEmail());

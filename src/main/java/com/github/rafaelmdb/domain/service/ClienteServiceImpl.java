@@ -31,7 +31,7 @@ public class ClienteServiceImpl extends BaseService implements ClienteService {
 
     private void validarCliente(Cliente cliente){
         if(Strings.isEmpty(cliente.getNome())){
-            throw new RegraNegocioException(messageService.getMessage("descricao.obrigatoria",null));
+            throw new RegraNegocioException(messageService.getMessage("nome.obrigatorio",null));
         }
     }
 
@@ -45,7 +45,7 @@ public class ClienteServiceImpl extends BaseService implements ClienteService {
     public Cliente obterPorId(UUID id) {
         return clienteRepo
                 .findById(id)
-                .orElseThrow(()->new RegraNegocioException("cliente.nao.encontrado"));
+                .orElseThrow(()->new RegraNegocioException(messageService.getMessage("cliente.nao.encontrado", null)));
     }
 
     @Override

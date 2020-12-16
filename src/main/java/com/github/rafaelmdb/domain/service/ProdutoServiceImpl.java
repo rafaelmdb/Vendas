@@ -45,7 +45,7 @@ public class ProdutoServiceImpl extends BaseService implements ProdutoService {
     public Produto obterPorId(UUID id) {
         return produtoRepo
                 .findById(id)
-                .orElseThrow(()->new RegraNegocioException("produto.nao.encontrado"));
+                .orElseThrow(()->new RegraNegocioException(messageService.getMessage("produto.nao.encontrado", null)));
     }
 
     @Override
