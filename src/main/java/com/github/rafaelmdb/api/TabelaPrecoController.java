@@ -22,14 +22,12 @@ public class TabelaPrecoController {
 
     private final TabelaPrecoService tabelaPrecoService;
     private final TabelaPrecoConverter tabelaPrecoConverter;
-    private final TabelaPrecoItemConverter tabelaPrecoItemConverter;
     private final TabelaPrecoRepo tabelaPrecoRepo;
 
-    public TabelaPrecoController(TabelaPrecoService tabelaPrecoService, TabelaPrecoConverter tabelaPrecoConverter, TabelaPrecoRepo tabelaPrecoRepo, TabelaPrecoItemConverter tabelaPrecoItemConverter) {
+    public TabelaPrecoController(TabelaPrecoService tabelaPrecoService, TabelaPrecoConverter tabelaPrecoConverter, TabelaPrecoRepo tabelaPrecoRepo) {
         this.tabelaPrecoService = tabelaPrecoService;
         this.tabelaPrecoConverter = tabelaPrecoConverter;
         this.tabelaPrecoRepo = tabelaPrecoRepo;
-        this.tabelaPrecoItemConverter=tabelaPrecoItemConverter;
     }
 
     @PostMapping
@@ -75,12 +73,5 @@ public class TabelaPrecoController {
                 tabelaPrecoRepo.findAll(example));
 
         return resultado;
-    }
-
-    @PostMapping("{id}/itens")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UUID criar(@RequestBody TabelaPrecoItemDTO dto) {
-        TabelaPrecoItem tabelaPrecoItem = tabelaPrecoItemConverter.createFrom(dto);
-        return tabelaPrecoService.adicionarItem(tabelaPrecoItem).getId();
     }
 }

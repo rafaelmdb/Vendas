@@ -54,6 +54,18 @@ public class TabelaPrecoServiceImpl extends BaseService implements TabelaPrecoSe
     }
 
     @Override
+    public TabelaPrecoItem alterarItem(TabelaPrecoItem tabelaPrecoItem) {
+        return tabelaPrecoItemRepo.save(tabelaPrecoItem);
+    }
+
+    @Override
+    public TabelaPrecoItem removerItem(UUID id) {
+        return tabelaPrecoItemRepo
+                .findById(id)
+                .orElseThrow(()->new RegraNegocioException(messageService.getMessage("tabelapreco.nao.encontrada", null)));
+    }
+
+    @Override
     public void remover(UUID id) {
         TabelaPreco tabelaPreco = obterPorId(id);
         tabelaPrecoRepo.delete(tabelaPreco);

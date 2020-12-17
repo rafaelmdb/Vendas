@@ -6,6 +6,7 @@ import com.github.rafaelmdb.domain.entity.TabelaPreco;
 import com.github.rafaelmdb.domain.entity.TabelaPrecoItem;
 import com.github.rafaelmdb.domain.repo.ProdutoRepo;
 import com.github.rafaelmdb.domain.repo.TabelaPrecoRepo;
+import com.github.rafaelmdb.domain.service.MessageService;
 import com.github.rafaelmdb.dto.TabelaPrecoItemDTO;
 import com.github.rafaelmdb.exception.RegraNegocioException;
 import org.springframework.stereotype.Component;
@@ -14,26 +15,35 @@ import org.springframework.stereotype.Component;
 public class TabelaPrecoItemConverter extends BaseConverter<TabelaPrecoItem, TabelaPrecoItemDTO>{
     private final ProdutoRepo produtoRepo;
     private final TabelaPrecoRepo tabelaPrecoRepo;
+    private final MessageService messageService;
 
-    public TabelaPrecoItemConverter(ProdutoRepo produtoRepo, TabelaPrecoRepo tabelaPrecoRepo){
+    public TabelaPrecoItemConverter(ProdutoRepo produtoRepo, TabelaPrecoRepo tabelaPrecoRepo, MessageService messageService){
         this.produtoRepo=produtoRepo;
         this.tabelaPrecoRepo = tabelaPrecoRepo;
+        this.messageService = messageService;
     }
 
     @Override
     protected TabelaPrecoItem DoCreateFrom(TabelaPrecoItemDTO dto){
         TabelaPrecoItem tabelaPrecoItem = new TabelaPrecoItem();
 
-        Produto produto = produtoRepo.findById(dto.getProdutoId())
-                .orElseThrow(()-> new RegraNegocioException("produto.nao.encontrado"));
+        if (dto.getProdutoId()!=null) {
+            Produto produto = produtoRepo.findById(dto.getProdutoId())
+                    .orElseThrow(() -> new RegraNegocioException(messageService.getMessage("produto.nao.encontrado", null)));
 
-        TabelaPreco tabelaPreco = tabelaPrecoRepo.findById(dto.getTabelaPrecoId())
-                .orElseThrow(()-> new RegraNegocioException("tabelapreco.nao.encontrada"));
+            tabelaPrecoItem.setProduto(produto);
+
+        }
+
+        if (dto.getTabelaPrecoId()!=null) {
+            TabelaPreco tabelaPreco = tabelaPrecoRepo.findById(dto.getTabelaPrecoId())
+                    .orElseThrow(() -> new RegraNegocioException(messageService.getMessage("tabelapreco.nao.encontrada", null)));
+
+            tabelaPrecoItem.setTabelaPreco(tabelaPreco);
+        }
 
         tabelaPrecoItem.setId(dto.getId());
         tabelaPrecoItem.setPreco(dto.getPreco());
-        tabelaPrecoItem.setProduto(produto);
-        tabelaPrecoItem.setTabelaPreco(tabelaPreco);
         return tabelaPrecoItem;
     }
 

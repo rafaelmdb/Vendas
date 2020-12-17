@@ -1,0 +1,1 @@
+insert into uf (id, sigla) values ('a1fe754b-c692-4515-af8e-28fff73a3a7e', 'SC');

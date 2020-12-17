@@ -22,4 +22,10 @@ public interface TabelaPrecoService {
 
     @Transactional
     TabelaPrecoItem adicionarItem(TabelaPrecoItem tabelaPrecoItem);
+
+    @Transactional
+    TabelaPrecoItem alterarItem(TabelaPrecoItem tabelaPrecoItem);
+
+    @Transactional
+    TabelaPrecoItem removerItem(UUID id);
 }
