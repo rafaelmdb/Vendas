@@ -5,27 +5,30 @@ import com.github.rafaelmdb.domain.repo.ProdutoRepo;
 import com.github.rafaelmdb.dto.ProdutoDTO;
 import com.github.rafaelmdb.domain.service.ProdutoService;
 import com.github.rafaelmdb.dto.converters.ProdutoConverter;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
+import com.github.rafaelmdb.service.MessageService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("api/produto")
-public class ProdutoController {
-
+public class ProdutoController extends  BaseController{
     private final ProdutoService produtoService;
-    private final ProdutoConverter produtoConverter;
     private final ProdutoRepo produtoRepo;
+    private final ProdutoConverter produtoConverter;
+    private final QueryHelper<Produto> query;
 
-    public ProdutoController(ProdutoService produtoService, ProdutoConverter produtoConverter, ProdutoRepo produtoRepo) {
+    public ProdutoController(MessageService messageService, ProdutoService produtoService, ProdutoConverter produtoConverter, ProdutoRepo produtoRepo, QueryHelper<Produto> query) {
+        super(messageService);
         this.produtoService = produtoService;
         this.produtoConverter = produtoConverter;
         this.produtoRepo = produtoRepo;
+        this.query = query;
     }
 
     @PostMapping
@@ -59,17 +62,13 @@ public class ProdutoController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<ProdutoDTO> obterPorExemplo(ProdutoDTO filtro){
-        ExampleMatcher matcher = ExampleMatcher
-                .matching()
-                .withIgnoreCase()
-                .withStringMatcher(ExampleMatcher.StringMatcher.STARTING);
+    public List<ProdutoDTO> obterPorExemplo(ProdutoDTO filtro, Integer pageNo, Integer pageSize, String sortBy, final HttpServletResponse response) {
+        Page page = query.obterPorExemplo(produtoRepo,
+                produtoConverter.createFrom(filtro),
+                pageNo,
+                pageSize,
+                sortBy);
 
-        Example example = Example.of(produtoConverter.createFrom(filtro), matcher);
-
-        List<ProdutoDTO> resultado = produtoConverter.createFromEntities(
-                produtoRepo.findAll(example));
-
-        return resultado;
+        return retornoListaPaginada(page, produtoConverter, response);
     }
 }

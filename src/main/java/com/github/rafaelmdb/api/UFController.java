@@ -5,8 +5,6 @@ import com.github.rafaelmdb.domain.repo.UFRepo;
 import com.github.rafaelmdb.domain.service.UFService;
 import com.github.rafaelmdb.dto.UFDTO;
 import com.github.rafaelmdb.dto.converters.UFConverter;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,11 +18,13 @@ public class UFController {
     private final UFService ufService;
     private final UFConverter ufConverter;
     private final UFRepo ufRepo;
+    private final QueryHelper<UF, UFDTO> query;
 
-    public UFController(UFService ufService, UFConverter ufConverter, UFRepo ufRepo) {
+    public UFController(UFService ufService, UFConverter ufConverter, UFRepo ufRepo, QueryHelper<UF, UFDTO> query) {
         this.ufService = ufService;
         this.ufConverter = ufConverter;
         this.ufRepo = ufRepo;
+        this.query = query;
     }
 
     @PostMapping
@@ -58,18 +58,7 @@ public class UFController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<UFDTO> obterPorExemplo(UFDTO filtro){
-        ExampleMatcher matcher = ExampleMatcher
-                .matching()
-                .withIgnoreCase()
-                .withIgnoreNullValues()
-                .withStringMatcher(ExampleMatcher.StringMatcher.STARTING);
-
-        Example example = Example.of(ufConverter.createFrom(filtro), matcher);
-
-        List<UFDTO> resultado = ufConverter.createFromEntities(
-                ufRepo.findAll(example));
-
-        return resultado;
+    public List<UFDTO> obterPorExemplo(UFDTO filtro, Integer pageNo, Integer pageSize, String sortBy){
+        return query.obterPorExemplo(ufRepo, ufConverter, filtro, pageNo, pageSize, sortBy);
     }
 }

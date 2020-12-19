@@ -4,22 +4,22 @@ import com.github.rafaelmdb.domain.entity.Cliente;
 import com.github.rafaelmdb.domain.repo.ClienteRepo;
 import com.github.rafaelmdb.exception.RegraNegocioException;
 import com.github.rafaelmdb.service.BaseService;
+import com.github.rafaelmdb.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.plugin2.message.Message;
 
 import java.util.UUID;
 
 @Service
 @Slf4j
 public class ClienteServiceImpl extends BaseService implements ClienteService {
-    @Autowired
-    private MessageService messageService;
-
     private final ClienteRepo clienteRepo;
 
-    public ClienteServiceImpl(ClienteRepo clienteRepo){
+    public ClienteServiceImpl(MessageService messageService, ClienteRepo clienteRepo){
+        super(messageService);
         this.clienteRepo = clienteRepo;
     }
 
@@ -30,9 +30,7 @@ public class ClienteServiceImpl extends BaseService implements ClienteService {
     }
 
     private void validarCliente(Cliente cliente){
-        if(Strings.isEmpty(cliente.getNome())){
-            throw new RegraNegocioException(messageService.getMessage("nome.obrigatorio",null));
-        }
+        getMessageService().validar(Strings.isEmpty(cliente.getNome()), "nome.obrigatorio");
     }
 
     @Override
@@ -45,7 +43,7 @@ public class ClienteServiceImpl extends BaseService implements ClienteService {
     public Cliente obterPorId(UUID id) {
         return clienteRepo
                 .findById(id)
-                .orElseThrow(()->new RegraNegocioException(messageService.getMessage("cliente.nao.encontrado", null)));
+                .orElseThrow(()->new RegraNegocioException(getMessageService().getMessage("cliente.nao.encontrado", null)));
     }
 
     @Override

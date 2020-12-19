@@ -1,33 +1,34 @@
 package com.github.rafaelmdb.api;
 
 import com.github.rafaelmdb.domain.entity.TabelaPreco;
-import com.github.rafaelmdb.domain.entity.TabelaPrecoItem;
 import com.github.rafaelmdb.domain.repo.TabelaPrecoRepo;
 import com.github.rafaelmdb.domain.service.TabelaPrecoService;
 import com.github.rafaelmdb.dto.TabelaPrecoDTO;
-import com.github.rafaelmdb.dto.TabelaPrecoItemDTO;
 import com.github.rafaelmdb.dto.converters.TabelaPrecoConverter;
-import com.github.rafaelmdb.dto.converters.TabelaPrecoItemConverter;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
+import com.github.rafaelmdb.service.MessageService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("api/tabelapreco")
-public class TabelaPrecoController {
+public class TabelaPrecoController extends BaseController{
 
     private final TabelaPrecoService tabelaPrecoService;
     private final TabelaPrecoConverter tabelaPrecoConverter;
     private final TabelaPrecoRepo tabelaPrecoRepo;
+    private final QueryHelper<TabelaPreco> query;
 
-    public TabelaPrecoController(TabelaPrecoService tabelaPrecoService, TabelaPrecoConverter tabelaPrecoConverter, TabelaPrecoRepo tabelaPrecoRepo) {
+    public TabelaPrecoController(MessageService messageService, TabelaPrecoService tabelaPrecoService, TabelaPrecoConverter tabelaPrecoConverter, TabelaPrecoRepo tabelaPrecoRepo, QueryHelper<TabelaPreco> query) {
+        super(messageService);
         this.tabelaPrecoService = tabelaPrecoService;
         this.tabelaPrecoConverter = tabelaPrecoConverter;
         this.tabelaPrecoRepo = tabelaPrecoRepo;
+        this.query = query;
     }
 
     @PostMapping
@@ -61,17 +62,8 @@ public class TabelaPrecoController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<TabelaPrecoDTO> obterPorExemplo(TabelaPrecoDTO filtro){
-        ExampleMatcher matcher = ExampleMatcher
-                .matching()
-                .withIgnoreCase()
-                .withStringMatcher(ExampleMatcher.StringMatcher.STARTING);
-
-        Example example = Example.of(tabelaPrecoConverter.createFrom(filtro), matcher);
-
-        List<TabelaPrecoDTO> resultado = tabelaPrecoConverter.createFromEntities(
-                tabelaPrecoRepo.findAll(example));
-
-        return resultado;
+    public List<TabelaPrecoDTO> obterPorExemplo(TabelaPrecoDTO filtro, Integer pageNo, Integer pageSize, String sortBy, HttpServletResponse response) {
+        Page page =  query.obterPorExemplo(tabelaPrecoRepo, tabelaPrecoConverter.createFrom(filtro), pageNo, pageSize, sortBy);
+        return prepararRetornoListaPaginada(page, tabelaPrecoConverter, response);
     }
 }

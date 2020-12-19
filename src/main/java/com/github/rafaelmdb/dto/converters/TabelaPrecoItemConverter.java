@@ -6,9 +6,9 @@ import com.github.rafaelmdb.domain.entity.TabelaPreco;
 import com.github.rafaelmdb.domain.entity.TabelaPrecoItem;
 import com.github.rafaelmdb.domain.repo.ProdutoRepo;
 import com.github.rafaelmdb.domain.repo.TabelaPrecoRepo;
-import com.github.rafaelmdb.domain.service.MessageService;
 import com.github.rafaelmdb.dto.TabelaPrecoItemDTO;
 import com.github.rafaelmdb.exception.RegraNegocioException;
+import com.github.rafaelmdb.service.MessageService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,7 +17,7 @@ public class TabelaPrecoItemConverter extends BaseConverter<TabelaPrecoItem, Tab
     private final TabelaPrecoRepo tabelaPrecoRepo;
     private final MessageService messageService;
 
-    public TabelaPrecoItemConverter(ProdutoRepo produtoRepo, TabelaPrecoRepo tabelaPrecoRepo, MessageService messageService){
+    public TabelaPrecoItemConverter(MessageService messageService, ProdutoRepo produtoRepo, TabelaPrecoRepo tabelaPrecoRepo){
         this.produtoRepo=produtoRepo;
         this.tabelaPrecoRepo = tabelaPrecoRepo;
         this.messageService = messageService;

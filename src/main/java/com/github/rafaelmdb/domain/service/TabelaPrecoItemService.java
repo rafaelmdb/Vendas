@@ -4,19 +4,20 @@ import com.github.rafaelmdb.domain.entity.TabelaPreco;
 import com.github.rafaelmdb.domain.entity.TabelaPrecoItem;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.UUID;
 
 @Service
-public interface TabelaPrecoService {
+public interface TabelaPrecoItemService {
     @Transactional
-    TabelaPreco criar(TabelaPreco tabelaPreco);
+    TabelaPrecoItem adicionar(TabelaPrecoItem tabelaPrecoItem);
 
     @Transactional
-    TabelaPreco alterar(TabelaPreco tabelaPreco);
+    TabelaPrecoItem alterar(TabelaPrecoItem tabelaPrecoItem);
 
     @Transactional
-    void remover(UUID id);
+    TabelaPrecoItem remover(UUID id);
 
     @Transactional(readOnly = true)
-    TabelaPreco obterPorId(UUID id);
+    TabelaPrecoItem obterPorId(UUID id);
 }

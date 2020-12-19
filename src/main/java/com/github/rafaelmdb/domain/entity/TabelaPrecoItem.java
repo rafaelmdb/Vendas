@@ -29,6 +29,7 @@ public class TabelaPrecoItem extends BaseEntity {
     @ManyToOne()
     @JoinColumn(name="PRODUTOID")
     @Type(type="uuid-char")
+    @NotNull
     private Produto produto;
 
     @Column(name="PRECO")

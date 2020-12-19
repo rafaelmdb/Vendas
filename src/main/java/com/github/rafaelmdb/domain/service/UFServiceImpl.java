@@ -4,8 +4,8 @@ import com.github.rafaelmdb.domain.entity.UF;
 import com.github.rafaelmdb.domain.repo.UFRepo;
 import com.github.rafaelmdb.exception.RegraNegocioException;
 import com.github.rafaelmdb.service.BaseService;
+import com.github.rafaelmdb.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -13,12 +13,10 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class UFServiceImpl extends BaseService implements UFService {
-    @Autowired
-    private final MessageService messageService;
     private final UFRepo uFRepo;
 
     public UFServiceImpl(MessageService messageService, UFRepo uFRepo){
-        this.messageService = messageService;
+        super(messageService);
         this.uFRepo = uFRepo;
     }
 
@@ -29,6 +27,7 @@ public class UFServiceImpl extends BaseService implements UFService {
     }
 
     private void validarUF(UF uF){
+        getMessageService().validar(uF.getSigla()==null, "sigla.uf.nao.informada");
     }
 
     @Override
@@ -41,7 +40,7 @@ public class UFServiceImpl extends BaseService implements UFService {
     public UF obterPorId(UUID id) {
         return uFRepo
                 .findById(id)
-                .orElseThrow(()->new RegraNegocioException(messageService.getMessage("uf.nao.encontrada", null)));
+                .orElseThrow(()->new RegraNegocioException(getMessageService().getMessage("uf.nao.encontrada", null)));
     }
 
     @Override

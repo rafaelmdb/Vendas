@@ -6,6 +6,7 @@ import com.github.rafaelmdb.domain.repo.TabelaPrecoItemRepo;
 import com.github.rafaelmdb.domain.repo.TabelaPrecoRepo;
 import com.github.rafaelmdb.exception.RegraNegocioException;
 import com.github.rafaelmdb.service.BaseService;
+import com.github.rafaelmdb.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,15 +16,11 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class TabelaPrecoServiceImpl extends BaseService implements TabelaPrecoService {
-    @Autowired
-    private final MessageService messageService;
     private final TabelaPrecoRepo tabelaPrecoRepo;
-    private final TabelaPrecoItemRepo tabelaPrecoItemRepo;
 
-    public TabelaPrecoServiceImpl(MessageService messageService, TabelaPrecoRepo tabelaPrecoRepo, TabelaPrecoItemRepo tabelaPrecoItemRepo){
-        this.messageService = messageService;
+    public TabelaPrecoServiceImpl(MessageService messageService, TabelaPrecoRepo tabelaPrecoRepo){
+        super(messageService);
         this.tabelaPrecoRepo = tabelaPrecoRepo;
-        this.tabelaPrecoItemRepo = tabelaPrecoItemRepo;
     }
 
     @Override
@@ -33,6 +30,9 @@ public class TabelaPrecoServiceImpl extends BaseService implements TabelaPrecoSe
     }
 
     private void validarTabelaPreco(TabelaPreco tabelaPreco){
+        getMessageService().validar(tabelaPreco.getNumero()==null, "produto.nao.informado");
+        getMessageService().validar(tabelaPreco.getDataTabela()==null, "data.nao.informada");
+        getMessageService().validar(tabelaPreco.getNumero()==null, "numero.nao.informado");
     }
 
     @Override
@@ -45,24 +45,7 @@ public class TabelaPrecoServiceImpl extends BaseService implements TabelaPrecoSe
     public TabelaPreco obterPorId(UUID id) {
         return tabelaPrecoRepo
                 .findById(id)
-                .orElseThrow(()->new RegraNegocioException(messageService.getMessage("tabelapreco.nao.encontrada", null)));
-    }
-
-    @Override
-    public TabelaPrecoItem adicionarItem(TabelaPrecoItem tabelaPrecoItem) {
-        return tabelaPrecoItemRepo.save(tabelaPrecoItem);
-    }
-
-    @Override
-    public TabelaPrecoItem alterarItem(TabelaPrecoItem tabelaPrecoItem) {
-        return tabelaPrecoItemRepo.save(tabelaPrecoItem);
-    }
-
-    @Override
-    public TabelaPrecoItem removerItem(UUID id) {
-        return tabelaPrecoItemRepo
-                .findById(id)
-                .orElseThrow(()->new RegraNegocioException(messageService.getMessage("tabelapreco.nao.encontrada", null)));
+                .orElseThrow(()->new RegraNegocioException(getMessageService().getMessage("tabelapreco.nao.encontrada", null)));
     }
 
     @Override
