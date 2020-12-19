@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/produto")
-public class ProdutoController extends  BaseController{
+public class ProdutoController extends BaseController{
     private final ProdutoService produtoService;
     private final ProdutoRepo produtoRepo;
     private final ProdutoConverter produtoConverter;
@@ -69,6 +69,6 @@ public class ProdutoController extends  BaseController{
                 pageSize,
                 sortBy);
 
-        return retornoListaPaginada(page, produtoConverter, response);
+        return prepararRetornoListaPaginada(page, produtoConverter, response);
     }
 }

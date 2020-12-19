@@ -5,22 +5,25 @@ import com.github.rafaelmdb.domain.repo.UFRepo;
 import com.github.rafaelmdb.domain.service.UFService;
 import com.github.rafaelmdb.dto.UFDTO;
 import com.github.rafaelmdb.dto.converters.UFConverter;
+import com.github.rafaelmdb.service.MessageService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("api/uf")
-public class UFController {
-
+public class UFController extends BaseController{
     private final UFService ufService;
     private final UFConverter ufConverter;
     private final UFRepo ufRepo;
-    private final QueryHelper<UF, UFDTO> query;
+    private final QueryHelper<UF> query;
 
-    public UFController(UFService ufService, UFConverter ufConverter, UFRepo ufRepo, QueryHelper<UF, UFDTO> query) {
+    public UFController(MessageService messageService, UFService ufService, UFConverter ufConverter, UFRepo ufRepo, QueryHelper<UF> query) {
+        super(messageService);
         this.ufService = ufService;
         this.ufConverter = ufConverter;
         this.ufRepo = ufRepo;
@@ -58,7 +61,8 @@ public class UFController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<UFDTO> obterPorExemplo(UFDTO filtro, Integer pageNo, Integer pageSize, String sortBy){
-        return query.obterPorExemplo(ufRepo, ufConverter, filtro, pageNo, pageSize, sortBy);
+    public List<UFDTO> obterPorExemplo(UFDTO filtro, Integer pageNo, Integer pageSize, String sortBy, final HttpServletResponse response){
+        Page page = query.obterPorExemplo(ufRepo, ufConverter.createFrom(filtro), pageNo, pageSize, sortBy);
+        return prepararRetornoListaPaginada(page, ufConverter, response);
     }
 }
