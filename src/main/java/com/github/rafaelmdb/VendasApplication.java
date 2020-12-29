@@ -16,12 +16,6 @@ public class VendasApplication {
         SpringApplication.run(VendasApplication.class, args);
     }
 
-    @Autowired
-    ProdutoService pessoaService;
-
-    @Autowired
-    ProdutoService produtoService;
-
     //@Bean
     public CommandLineRunner init() {
         return args -> {
