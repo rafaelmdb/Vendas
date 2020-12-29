@@ -59,7 +59,7 @@ public class PedidoServiceImpl extends BaseService implements PedidoService {
 
     @Override
     public Pedido cancelar(Pedido pedido) {
-        getMessageService().validar(Arrays.asList(StatusPedido.RASCUNHO, StatusPedido.LANCADO).contains(pedido.getStatus()),"pedido.deve.estar.em.rascunho.ou.lancado.para.cancelar");
+        getMessageService().validar(!Arrays.asList(StatusPedido.RASCUNHO, StatusPedido.LANCADO, StatusPedido.APROVADO).contains(pedido.getStatus()),"status.invalido.para.cancelar.pedido");
         this.validarPedido(pedido);
         pedido.setStatus(StatusPedido.CANCELADO);
         return this.pedidoRepo.save(pedido);

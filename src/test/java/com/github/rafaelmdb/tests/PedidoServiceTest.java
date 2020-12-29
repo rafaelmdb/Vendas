@@ -82,6 +82,11 @@ public class PedidoServiceTest {
 
         pedido = criarPedido();
         pedido = pedidoService.lancar(pedido);
+        pedidoService.cancelar(pedido);
+        assertEquals(pedido.getStatus(), StatusPedido.CANCELADO, "Status diferente de cancelado");
+
+        pedido = criarPedido();
+        pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.aprovar(pedido);
         pedidoService.cancelar(pedido);
         assertEquals(pedido.getStatus(), StatusPedido.CANCELADO, "Status diferente de cancelado");
@@ -93,7 +98,7 @@ public class PedidoServiceTest {
         pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.cancelar(pedido);
         pedidoService.reverterCancelamento(pedido);
-        assertEquals(pedido.getStatus(), StatusPedido.LANCADO, "Status diferente de lançado");
+        assertEquals(pedido.getStatus(), StatusPedido.RASCUNHO, "Status diferente de rascunho");
     }
 
     @Test
