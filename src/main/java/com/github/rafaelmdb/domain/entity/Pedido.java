@@ -9,6 +9,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -44,29 +45,25 @@ public class Pedido extends BaseEntity {
     @NotNull
     private StatusPedido status;
 
-    @Column(name="VALORTOTALPRODUTO")
-    @NotNull
-    private double valortotalProduto;
-
     @Column(name="VALORTOTALIPI")
     @NotNull
-    private double valortotalIPI;
+    private BigDecimal valorTotalIPI;
 
     @Column(name="VALORTOTALDESCONTO")
     @NotNull
-    private double valorTotalDesconto;
+    private BigDecimal valorTotalDesconto;
 
     @Column(name="VALORTOTALBRUTO")
     @NotNull
-    private double valorTotalBruto;
+    private BigDecimal valorTotalBruto;
 
     @Column(name="VALORTOTALLIQUIDO")
     @NotNull
-    private double valorTotalLiquido;
+    private BigDecimal valorTotalLiquido;
 
     @Column(name="VALORTOTALPEDIDO")
     @NotNull
-    private double valorTotalPedido;
+    private BigDecimal valorTotalPedido;
 
     public Pedido(){
         this.id = UUID.randomUUID();

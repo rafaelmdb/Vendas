@@ -2,14 +2,16 @@ package com.github.rafaelmdb.tests;
 
 import com.github.rafaelmdb.domain.entity.Cliente;
 import com.github.rafaelmdb.domain.entity.Pedido;
+import com.github.rafaelmdb.domain.entity.PedidoItem;
+import com.github.rafaelmdb.domain.entity.Produto;
 import com.github.rafaelmdb.domain.enums.StatusPedido;
+import com.github.rafaelmdb.domain.service.PedidoItemService;
 import com.github.rafaelmdb.domain.service.PedidoService;
-import org.junit.jupiter.api.BeforeEach;
+import com.github.rafaelmdb.exception.RegraNegocioException;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -20,7 +22,10 @@ public class PedidoServiceTest {
     @Autowired
     private PedidoService pedidoService;
 
-    private Pedido criarPedido(){
+    @Autowired
+    private PedidoItemService pedidoItemService;
+
+    private Pedido criarPedido() {
         Cliente cliente = new Cliente();
         cliente.setId(UUID.fromString("07831cae-9423-443b-ae93-cd5e65a8b69c"));
 
@@ -28,46 +33,125 @@ public class PedidoServiceTest {
         pedido.setCliente(cliente);
         pedido.setDataEmissao(LocalDate.now());
         pedido.setNumero("1");
-        pedido.setValorTotalBruto(10);
-        pedido.setValorTotalDesconto(0);
-        pedido.setValortotalIPI(0);
-        pedido.setValorTotalPedido(10);
-        pedido.setValortotalProduto(0);
-        return pedidoService.criar(pedido);
+        pedido.setValorTotalBruto(BigDecimal.valueOf(5.85));
+        pedido.setValorTotalDesconto(BigDecimal.valueOf(0.05));
+        pedido.setValorTotalIPI(BigDecimal.valueOf(0.12));
+        pedido.setValorTotalLiquido(BigDecimal.valueOf(5.80));
+        pedido.setValorTotalPedido(BigDecimal.valueOf(5.92));
+        return pedido;
+    }
+
+    private PedidoItem criarItem(Pedido pedido) {
+        Produto produto = new Produto();
+        produto.setId(UUID.fromString("07831cae-9423-443b-ae93-cd5e65a8b69c"));
+
+        PedidoItem pedidoItem = new PedidoItem();
+        pedidoItem.setQuantidade(BigDecimal.valueOf(2));
+        pedidoItem.setPrecoBruto(BigDecimal.valueOf(3));
+        pedidoItem.setDescontoPreco(BigDecimal.valueOf(0.075));
+        pedidoItem.setPercDescontoPreco(BigDecimal.valueOf(2.5));
+        pedidoItem.setPrecoLiquido(BigDecimal.valueOf(2.925));
+        pedidoItem.setProdudo(produto);
+        pedidoItem.setPercIPI(BigDecimal.valueOf(2));
+        pedidoItem.setPercDescontoTotal(BigDecimal.valueOf(0.8547));
+        pedidoItem.setValorDescontoTotal(BigDecimal.valueOf(0.05));
+        pedidoItem.setValorIPI(BigDecimal.valueOf(0.12));
+        pedidoItem.setValorTotalBruto(BigDecimal.valueOf(5.85));
+        pedidoItem.setValorTotalLiquido(BigDecimal.valueOf(5.8));
+
+        return pedidoItem;
     }
 
     @Test
-    public void criarPedidoSucesso(){
+    public void criarPedidoSucesso() {
         Pedido pedido;
 
         try {
             pedido = criarPedido();
+            pedido = pedidoService.criar(pedido);
             assertEquals(pedido.getDataEmissao(), LocalDate.now(), "Data divergente");
             assertEquals(pedido.getStatus(), StatusPedido.RASCUNHO, "Status diferente de criado");
-        }
-        catch(Exception e){
-            assertNull(e==null, e.getMessage());
+        } catch (Exception e) {
+            assertNull(e == null, e.getMessage());
         }
     }
 
     @Test
-    public void lancarPedidoSucesso(){
+    public void lancarPedidoSucesso() {
         Pedido pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+
         pedido = pedidoService.lancar(pedido);
         assertEquals(pedido.getStatus(), StatusPedido.LANCADO, "Status diferente de lançado");
     }
 
     @Test
-    public void aprovarPedidoSucesso(){
+    public void criarPedidoSemClienteFalha() {
         Pedido pedido = criarPedido();
+        pedido.setCliente(null);
+        Pedido finalPedido = pedido;
+        assertThrows(RegraNegocioException.class, () -> {
+            pedidoService.criar(finalPedido);
+        });
+    }
+
+    @Test
+    public void criarPedidoStatusInvalidoFalha() {
+        Pedido pedido = criarPedido();
+        pedido.setStatus(StatusPedido.APROVADO);
+        pedido  = pedidoService.criar(pedido);
+        Pedido finalPedido = pedido;
+        assertThrows(RegraNegocioException.class, () -> {
+            pedidoService.criar(finalPedido);
+        });
+    }
+
+    @Test
+    public void lancarPedidoSemItensFalha(){
+        Pedido pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+        Pedido finalPedido = pedido;
+        assertThrows(RegraNegocioException.class, () -> {pedidoService.lancar(finalPedido);});
+    }
+
+    @Test
+    public void lancarPedidoTotalDivergenteFalha(){
+        Pedido pedido = criarPedido();
+        pedido.setValorTotalIPI(BigDecimal.valueOf(1));
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem.setValorTotalLiquido(BigDecimal.valueOf(1000));
+        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+
+        assertThrows(RegraNegocioException.class, () -> {pedidoService.lancar(finalPedido);});
+
+    }
+
+    @Test
+    public void aprovarPedidoSucesso() {
+        Pedido pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+
         pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.aprovar(pedido);
         assertEquals(pedido.getStatus(), StatusPedido.APROVADO, "Status diferente de aprovado");
     }
 
     @Test
-    public void reverterAprovacaoPedidoSucesso(){
+    public void reverterAprovacaoPedidoSucesso() {
         Pedido pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+
         pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.aprovar(pedido);
         pedidoService.reverterAprovacao(pedido);
@@ -75,17 +159,28 @@ public class PedidoServiceTest {
     }
 
     @Test
-    public void cancelarPedidoSucesso(){
+    public void cancelarPedidoSucesso() {
         Pedido pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
         pedidoService.cancelar(pedido);
         assertEquals(pedido.getStatus(), StatusPedido.CANCELADO, "Status diferente de cancelado");
 
         pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+
         pedido = pedidoService.lancar(pedido);
         pedidoService.cancelar(pedido);
         assertEquals(pedido.getStatus(), StatusPedido.CANCELADO, "Status diferente de cancelado");
 
         pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+
         pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.aprovar(pedido);
         pedidoService.cancelar(pedido);
@@ -93,8 +188,13 @@ public class PedidoServiceTest {
     }
 
     @Test
-    public void reverterCancelamentoPedidoSucesso(){
+    public void reverterCancelamentoPedidoSucesso() {
         Pedido pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+
         pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.cancelar(pedido);
         pedidoService.reverterCancelamento(pedido);
@@ -102,8 +202,13 @@ public class PedidoServiceTest {
     }
 
     @Test
-    public void faturarPedidoSucesso(){
+    public void faturarPedidoSucesso() {
         Pedido pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+
         pedido = pedidoService.lancar(pedido);
         pedidoService.aprovar(pedido);
         pedidoService.faturar(pedido);
@@ -111,8 +216,13 @@ public class PedidoServiceTest {
     }
 
     @Test
-    public void reverterFaturamentoPedidoSucesso(){
+    public void reverterFaturamentoPedidoSucesso() {
         Pedido pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+
         pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.aprovar(pedido);
         pedido = pedidoService.faturar(pedido);

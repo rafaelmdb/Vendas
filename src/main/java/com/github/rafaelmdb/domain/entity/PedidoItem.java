@@ -8,6 +8,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -25,6 +26,11 @@ public class PedidoItem extends BaseEntity {
     private UUID id;
 
     @ManyToOne()
+    @NotNull
+    @JoinColumn(name="pedidoid")
+    private Pedido pedido;
+
+    @ManyToOne()
     @JoinColumn(name="PRODUTOID")
     @Type(type="uuid-char")
     @NotNull
@@ -32,39 +38,47 @@ public class PedidoItem extends BaseEntity {
 
     @Column(name="QUANTIDADE")
     @NotNull
-    private double quantidade;
+    private BigDecimal quantidade;
 
     @Column(name="PRECOBRUTO")
     @NotNull
-    private double precoBruto;
+    private BigDecimal precoBruto;
 
     @Column(name="PERCDESCONTOPRECO")
     @NotNull
-    private double percDescontoPreco;
+    private BigDecimal percDescontoPreco;
 
     @Column(name="DESCONTOPRECO")
     @NotNull
-    private double descontoPreo;
+    private BigDecimal descontoPreco;
 
     @Column(name="PRECOLIQUIDO")
     @NotNull
-    private double precoLiquido;
+    private BigDecimal precoLiquido;
 
     @Column(name="PERCIPI")
     @NotNull
-    private double percIPI;
+    private BigDecimal percIPI;
 
     @Column(name="VALORIPI")
     @NotNull
-    private double valorIPI;
+    private BigDecimal valorIPI;
 
     @Column(name="VALORTOTALBRUTO")
     @NotNull
-    private double valorTotalBruto;
+    private BigDecimal valorTotalBruto;
+
+    @Column(name="VALORDESCONTOTOTAL")
+    @NotNull
+    private BigDecimal valorDescontoTotal;
+
+    @Column(name="PERCDESCONTOTOTAL")
+    @NotNull
+    private BigDecimal percDescontoTotal;
 
     @Column(name="VALORTOTALLIQUIDO")
     @NotNull
-    private double valorTotalLiquido;
+    private BigDecimal valorTotalLiquido;
 
 
     public PedidoItem(){
