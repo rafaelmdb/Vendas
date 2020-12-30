@@ -12,7 +12,7 @@ git rm arquivo
 
 Enviando as alterações:
 git commit -m "Mensagem obrigatória"
-Antes de enviar faça o pull para pegaras atualizações
+Antes de enviar faça o pull para pegar as atualizações
 git pull
 git push
 
