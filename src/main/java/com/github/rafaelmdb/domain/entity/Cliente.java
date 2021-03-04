@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.util.UUID;
 
 @Data
@@ -22,6 +23,7 @@ public class Cliente extends BaseEntity {
     private UUID id;
 
     @Column(name="NOME", length = 255)
+    @NotEmpty(message = "Informe o nome do cliente")
     private String nome;
 
     @Column(name="CNPJCPF", length = 14)

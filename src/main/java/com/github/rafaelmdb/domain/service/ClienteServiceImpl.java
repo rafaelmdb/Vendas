@@ -7,10 +7,11 @@ import com.github.rafaelmdb.service.BaseService;
 import com.github.rafaelmdb.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.plugin2.message.Message;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.*;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -25,18 +26,19 @@ public class ClienteServiceImpl extends BaseService implements ClienteService {
 
     @Override
     public Cliente criar(Cliente cliente){
-        validarCliente(cliente);
-        return clienteRepo.save(cliente);
-    }
+        try {
+            clienteRepo.save(cliente);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
 
-    private void validarCliente(Cliente cliente){
-        getMessageService().validar(Strings.isEmpty(cliente.getNome()), "nome.obrigatorio");
+         return null;
     }
 
     @Override
     public Cliente alterar(Cliente cliente) {
         validarAlteracao(cliente.getId(), clienteRepo);
-        validarCliente(cliente);
         return clienteRepo.save(cliente);
     }
 

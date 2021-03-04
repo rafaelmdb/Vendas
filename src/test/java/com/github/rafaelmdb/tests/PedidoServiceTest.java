@@ -5,7 +5,6 @@ import com.github.rafaelmdb.domain.entity.Pedido;
 import com.github.rafaelmdb.domain.entity.PedidoItem;
 import com.github.rafaelmdb.domain.entity.Produto;
 import com.github.rafaelmdb.domain.enums.StatusPedido;
-import com.github.rafaelmdb.domain.service.PedidoItemService;
 import com.github.rafaelmdb.domain.service.PedidoService;
 import com.github.rafaelmdb.exception.RegraNegocioException;
 import org.junit.jupiter.api.Test;
@@ -21,9 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PedidoServiceTest {
     @Autowired
     private PedidoService pedidoService;
-
-    @Autowired
-    private PedidoItemService pedidoItemService;
 
     private Pedido criarPedido() {
         Cliente cliente = new Cliente();
@@ -82,7 +78,7 @@ public class PedidoServiceTest {
         pedido = pedidoService.criar(pedido);
 
         PedidoItem pedidoItem = this.criarItem(pedido);
-        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
 
         pedido = pedidoService.lancar(pedido);
         assertEquals(pedido.getStatus(), StatusPedido.LANCADO, "Status diferente de lançado");
@@ -102,7 +98,6 @@ public class PedidoServiceTest {
     public void criarPedidoStatusInvalidoFalha() {
         Pedido pedido = criarPedido();
         pedido.setStatus(StatusPedido.APROVADO);
-        pedido  = pedidoService.criar(pedido);
         Pedido finalPedido = pedido;
         assertThrows(RegraNegocioException.class, () -> {
             pedidoService.criar(finalPedido);
@@ -118,26 +113,12 @@ public class PedidoServiceTest {
     }
 
     @Test
-    public void lancarPedidoTotalDivergenteFalha(){
-        Pedido pedido = criarPedido();
-        pedido.setValorTotalIPI(BigDecimal.valueOf(1));
-        pedido = pedidoService.criar(pedido);
-
-        PedidoItem pedidoItem = this.criarItem(pedido);
-        pedidoItem.setValorTotalLiquido(BigDecimal.valueOf(1000));
-        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
-
-        assertThrows(RegraNegocioException.class, () -> {pedidoService.lancar(finalPedido);});
-
-    }
-
-    @Test
     public void aprovarPedidoSucesso() {
         Pedido pedido = criarPedido();
         pedido = pedidoService.criar(pedido);
 
         PedidoItem pedidoItem = this.criarItem(pedido);
-        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
 
         pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.aprovar(pedido);
@@ -150,7 +131,7 @@ public class PedidoServiceTest {
         pedido = pedidoService.criar(pedido);
 
         PedidoItem pedidoItem = this.criarItem(pedido);
-        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
 
         pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.aprovar(pedido);
@@ -169,7 +150,7 @@ public class PedidoServiceTest {
         pedido = pedidoService.criar(pedido);
 
         PedidoItem pedidoItem = this.criarItem(pedido);
-        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
 
         pedido = pedidoService.lancar(pedido);
         pedidoService.cancelar(pedido);
@@ -178,8 +159,8 @@ public class PedidoServiceTest {
         pedido = criarPedido();
         pedido = pedidoService.criar(pedido);
 
-        PedidoItem pedidoItem = this.criarItem(pedido);
-        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+        pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
 
         pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.aprovar(pedido);
@@ -193,7 +174,7 @@ public class PedidoServiceTest {
         pedido = pedidoService.criar(pedido);
 
         PedidoItem pedidoItem = this.criarItem(pedido);
-        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
 
         pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.cancelar(pedido);
@@ -207,7 +188,7 @@ public class PedidoServiceTest {
         pedido = pedidoService.criar(pedido);
 
         PedidoItem pedidoItem = this.criarItem(pedido);
-        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
 
         pedido = pedidoService.lancar(pedido);
         pedidoService.aprovar(pedido);
@@ -221,12 +202,65 @@ public class PedidoServiceTest {
         pedido = pedidoService.criar(pedido);
 
         PedidoItem pedidoItem = this.criarItem(pedido);
-        pedidoItem = pedidoItemService.adicionarItem(pedido, pedidoItem);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
 
         pedido = pedidoService.lancar(pedido);
         pedido = pedidoService.aprovar(pedido);
         pedido = pedidoService.faturar(pedido);
         pedidoService.reverterFaturamento(pedido);
         assertEquals(pedido.getStatus(), StatusPedido.APROVADO, "Status diferente de aprovado");
+    }
+
+    @Test
+    public void removerItemPedidoSucesso(){
+        Pedido pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
+
+        pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
+
+        assertEquals(pedidoService.obterItensPorPedido(pedido.getId()).stream().count(), 2, "Quantidade de itens é divergente");
+        pedidoService.removerItem(pedidoItem.getId());
+        assertEquals(pedidoService.obterItensPorPedido(pedido.getId()).stream().count(), 1, "Quantidade de itens é divergente");
+    }
+
+    @Test
+    public void removerItemPedidoDiferenteRascunhoFalha(){
+        Pedido pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
+
+        pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
+
+        pedido = pedidoService.lancar(pedido);
+
+        PedidoItem finalPedidoItem = pedidoItem;
+        assertThrows(RegraNegocioException.class, ()->pedidoService.removerItem(finalPedidoItem.getId()));
+    }
+
+    @Test
+    public void alterarItemPedidoSucesso(){
+        Pedido pedido = criarPedido();
+        pedido = pedidoService.criar(pedido);
+
+        PedidoItem pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
+
+        pedidoItem = this.criarItem(pedido);
+        pedidoItem = pedidoService.adicionarItem(pedido, pedidoItem);
+
+        pedidoItem.setQuantidade(BigDecimal.valueOf(1));
+        pedidoItem.setPrecoBruto(BigDecimal.valueOf(1));
+
+        pedidoItem = pedidoService.alterarItem(pedidoItem);
+
+        assertEquals(pedidoItem.getQuantidade(), BigDecimal.valueOf(1));
+        assertEquals(pedidoItem.getPrecoBruto(), BigDecimal.valueOf(1));
     }
 }
